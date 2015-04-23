@@ -41,6 +41,7 @@ $(function(){
             model.currentCat = model.cats[0];
             catListView.init();
             catView.init();
+            catAdminView.init();
         },
         getCats: function() {
             return model.cats;
@@ -54,9 +55,22 @@ $(function(){
         incrementCounter: function() {
             model.currentCat.clicks++;
             catView.render();
+            catAdminView.render();
+        },
+        showAdminPanel: function() {
+            catAdminView.render();
+            catAdminView.showPanel();
+        },
+        updateCat: function(name, src, counter) {
+            model.cats[model.currentCat.id].name = name;
+            model.cats[model.currentCat.id].img = src;
+            model.cats[model.currentCat.id].clicks = counter;
+            model.currentCat = model.cats[model.currentCat.id];
+
+            catView.render();
+            catAdminView.hidePanel();
         }
     };
-
 
     var catListView = {
         init: function() {
@@ -71,6 +85,7 @@ $(function(){
                     .click(function() {
                         octopus.setCurrentCat(cat);
                         catView.render();
+                        catAdminView.render();
                     })
                     .appendTo("#list");
             });
@@ -84,9 +99,13 @@ $(function(){
             this.catNameElem = $("#display").children("h2");
             this.catImgElem = $("#display").children("img");
             this.catCounterElem = $("#display").children("span");
+            this.catAdminElem = $("#display").children("button");
 
             this.catImgElem.click(function() {
                 octopus.incrementCounter();
+            });
+            this.catAdminElem.click(function() {
+                octopus.showAdminPanel();
             });
             this.render();
         },
@@ -97,6 +116,42 @@ $(function(){
             this.catImgElem.attr("src", cat.img)
         }
     };
+
+    var catAdminView = {
+        init: function() {
+            this.panel = $("#admin");
+            this.catNameInp = $("#inpName", "#admin");
+            this.catSrcInp = $("#inpSrc", "#admin");
+            this.catCounterInp = $("#inpCounter", "#admin");
+            this.catBTSave = $("#btSave", "#admin");
+            this.catBTCancel = $("#btCancel", "#admin");
+
+            var view = this;
+            this.catBTSave.click(function() {
+                octopus.updateCat(
+                        view.catNameInp.val(),
+                        view.catSrcInp.val(),
+                        view.catCounterInp.val()
+                    );
+            });
+            this.catBTCancel.click(function() {
+                view.hidePanel();
+            });
+            this.render();
+        },
+        showPanel: function() {
+            this.panel.show();
+        },
+        hidePanel: function() {
+            this.panel.hide();
+        },
+        render: function() {
+            var cat = octopus.getCurrentCat();
+            this.catNameInp.val(cat.name);
+            this.catSrcInp.val(cat.img);
+            this.catCounterInp.val(cat.clicks);
+        }
+    }
 
     octopus.init();
 });
