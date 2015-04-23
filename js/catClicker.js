@@ -21,8 +21,8 @@ $(function(){
             },
             {
                 id: 3,
-                name: "Thunder",
-                img: "./images/thunder.jpg",
+                name: "Cowboy Dave",
+                img: "./images/cowboy.jpg",
                 clicks: 0
             },
             {
@@ -41,9 +41,6 @@ $(function(){
             this.current = model.cats[0];
             view_list.init();
             view_display.init();
-        },
-        getCat: function(index) {
-            return null;
         },
         getCats: function() {
             return model.cats;
@@ -75,20 +72,23 @@ $(function(){
     };
 
     var view_display = {
+        $template: "",
         init: function() {
+            this.$template = $("#tmplt-cat");
             this.render();
         },
         render: function(){
             $("#display").children().remove();
+            var cat = octopus.current;
+            var $catEl = this.$template.clone();
+            $catEl.children("h2").text(cat.name);
+            $catEl.children("img").attr("src", cat.img);
+            $catEl.children("span").text(cat.clicks);
+            $catEl.appendTo("#display");
 
-            $("#display")
-                .append("<p class='cat-name'>"+octopus.current.name+"</p>")
-                .append("<img class='cat-img' src='"+octopus.current.img+"' />")
-                .append("<span class='cat-clicks'>"+octopus.current.clicks+"</span>");
-
-            $("#display img").click(function (a_catCopy){
-                octopus.current.clicks++;
-                $(".cat-clicks","#display").text(octopus.current.clicks);
+            $("#display img").click(function (){
+                cat.clicks++;
+                $(".cat-clicks","#display").text(cat.clicks);
             });
         }
     };
