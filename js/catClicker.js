@@ -1,5 +1,6 @@
 $(function(){
     var model = {
+        currentCat: null,
         cats: [
             {
                 id: 0,
@@ -36,23 +37,28 @@ $(function(){
 
 
     var octopus = {
-        current: null,
         init: function() {
-            this.current = model.cats[0];
-            view_list.init();
-            view_display.init();
+            model.currentCat = model.cats[0];
+            catListView.init();
+            catView.init();
         },
         getCats: function() {
             return model.cats;
         },
-        showCat: function(cat) {
-            this.current = cat;
-            view_display.render();
+        setCurrentCat: function(cat) {
+            model.currentCat = cat;
+        },
+        getCurrentCat: function() {
+            return model.currentCat;
+        },
+        incrementCounter: function() {
+            model.currentCat.clicks++;
+            catView.render();
         }
     };
 
 
-    var view_list = {
+    var catListView = {
         init: function() {
             this.render();
         },
@@ -63,7 +69,8 @@ $(function(){
                 var $link = $("<a href='#'>"+cat.name+"</a>");
                 $link
                     .click(function() {
-                        octopus.showCat(cat);
+                        octopus.setCurrentCat(cat);
+                        catView.render();
                     })
                     .appendTo("#list");
             });
@@ -71,25 +78,23 @@ $(function(){
         }
     };
 
-    var view_display = {
-        $template: "",
+    var catView = {
         init: function() {
-            this.$template = $("#tmplt-cat");
+            this.catElem = $("#display");
+            this.catNameElem = $("#display").children("h2");
+            this.catImgElem = $("#display").children("img");
+            this.catCounterElem = $("#display").children("span");
+
+            this.catImgElem.click(function() {
+                octopus.incrementCounter();
+            });
             this.render();
         },
         render: function(){
-            $("#display").children().remove();
-            var cat = octopus.current;
-            var $catEl = this.$template.clone();
-            $catEl.children("h2").text(cat.name);
-            $catEl.children("img").attr("src", cat.img);
-            $catEl.children("span").text(cat.clicks);
-            $catEl.appendTo("#display");
-
-            $("#display img").click(function (){
-                cat.clicks++;
-                $(".cat-clicks","#display").text(cat.clicks);
-            });
+            var cat = octopus.getCurrentCat();
+            this.catNameElem.text(cat.name)
+            this.catCounterElem.text(cat.clicks);
+            this.catImgElem.attr("src", cat.img)
         }
     };
 
